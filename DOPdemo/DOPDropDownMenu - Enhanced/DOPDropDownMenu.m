@@ -125,21 +125,21 @@
 #pragma mark - getter
 - (UIColor *)indicatorColor {
     if (!_indicatorColor) {
-        _indicatorColor = [UIColor blackColor];
+        _indicatorColor = [UIColor lightGrayColor];
     }
     return _indicatorColor;
 }
 
 - (UIColor *)textColor {
     if (!_textColor) {
-        _textColor = [UIColor blackColor];
+        _textColor = [UIColor lightGrayColor];
     }
     return _textColor;
 }
 
 - (UIColor *)separatorColor {
     if (!_separatorColor) {
-        _separatorColor = [UIColor blackColor];
+        _separatorColor = [UIColor lightGrayColor];
     }
     return _separatorColor;
 }
@@ -274,7 +274,7 @@
         [self.layer addSublayer:title];
         [tempTitles addObject:title];
         //indicator
-        CAShapeLayer *indicator = [self createIndicatorWithColor:self.indicatorColor andPosition:CGPointMake(titlePosition.x + titleSize.width, self.frame.size.height / 2)];
+        CAShapeLayer *indicator = [self createIndicatorWithColor:self.indicatorColor andPosition:CGPointMake(titlePosition.x + titleSize.width*0.5 +5, self.frame.size.height / 2)];
         [self.layer addSublayer:indicator];
         [tempIndicators addObject:indicator];
         
