@@ -268,12 +268,13 @@
         }else {
             titleString =[_dataSource menu:self titleForRowAtIndexPath:[DOPIndexPath indexPathWithCol:i row:0]];
         }
+        CGSize titleSize = [self calculateTitleSizeWithString:titleString];
         
         CATextLayer *title = [self createTextLayerWithNSString:titleString withColor:self.textColor andPosition:titlePosition];
         [self.layer addSublayer:title];
         [tempTitles addObject:title];
         //indicator
-        CAShapeLayer *indicator = [self createIndicatorWithColor:self.indicatorColor andPosition:CGPointMake((i + 1)*separatorLineInterval - 10, self.frame.size.height / 2)];
+        CAShapeLayer *indicator = [self createIndicatorWithColor:self.indicatorColor andPosition:CGPointMake(titlePosition.x + titleSize.width, self.frame.size.height / 2)];
         [self.layer addSublayer:indicator];
         [tempIndicators addObject:indicator];
         
@@ -369,18 +370,21 @@
     
     UIBezierPath *path = [UIBezierPath new];
     [path moveToPoint:CGPointMake(0, 0)];
-    [path addLineToPoint:CGPointMake(8, 0)];
+    
     [path addLineToPoint:CGPointMake(4, 5)];
-    [path closePath];
+    [path addLineToPoint:CGPointMake(8, 0)];
+    //[path closePath];
     
     layer.path = path.CGPath;
     layer.lineWidth = 0.8;
-    layer.fillColor = color.CGColor;
+    layer.fillColor = [UIColor clearColor].CGColor;
+    layer.strokeColor = color.CGColor;
     
     CGPathRef bound = CGPathCreateCopyByStrokingPath(layer.path, nil, layer.lineWidth, kCGLineCapButt, kCGLineJoinMiter, layer.miterLimit);
     layer.bounds = CGPathGetBoundingBox(bound);
     CGPathRelease(bound);
     layer.position = point;
+
     
     return layer;
 }
@@ -495,10 +499,10 @@
     
     if (forward) {
         // 展开
-        indicator.fillColor = _textSelectedColor.CGColor;
+        indicator.strokeColor = _textSelectedColor.CGColor;
     } else {
         // 收缩
-        indicator.fillColor = _textColor.CGColor;
+        indicator.strokeColor = _textColor.CGColor;
     }
     
     complete();
