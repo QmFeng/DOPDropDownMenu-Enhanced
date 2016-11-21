@@ -70,7 +70,7 @@
         unsigned int imageNameForItemsInRowAtIndexPath :1;
         unsigned int detailTextForRowAtIndexPath: 1;
         unsigned int detailTextForItemsInRowAtIndexPath: 1;
-        
+        unsigned int hightLightImageNameForRowAtIndexPath :1;
     }_dataSourceFlags;
 }
 
@@ -180,13 +180,26 @@
     
     if (indexPath.item < 0 ) {
         if (!_isClickHaveItemValid && [_dataSource menu:self numberOfItemsInRow:indexPath.row column:indexPath.column] > 0){
-            title.string = [_dataSource menu:self titleForItemsInRowAtIndexPath:[DOPIndexPath indexPathWithCol:indexPath.column row:self.isRemainMenuTitle ? 0 : indexPath.row item:0]];
+            
+            if (self.isRemainMenuTitle) {
+                title.string = [_dataSource menu:self titleForRowAtIndexPath:
+                                [DOPIndexPath indexPathWithCol:indexPath.column row:indexPath.row item:0]];
+            }else{
+                title.string = [_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:indexPath.column row:0]];
+            }
+            
             if (trigger) {
                 [_delegate menu:self didSelectRowAtIndexPath:[DOPIndexPath indexPathWithCol:indexPath.column row:indexPath.row item:0]];
             }
         }else {
-            title.string = [_dataSource menu:self titleForRowAtIndexPath:
-                            [DOPIndexPath indexPathWithCol:indexPath.column row:self.isRemainMenuTitle ? 0 : indexPath.row]];
+            
+            if (self.isRemainMenuTitle) {
+                title.string = [_dataSource menu:self titleForRowAtIndexPath:
+                                [DOPIndexPath indexPathWithCol:indexPath.column row:indexPath.row item:0]];
+            }else{
+                title.string = [_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:indexPath.column row:0]];
+            }
+            
             if (trigger) {
                 [_delegate menu:self didSelectRowAtIndexPath:indexPath];
             }
@@ -243,7 +256,7 @@
     _dataSourceFlags.imageNameForItemsInRowAtIndexPath = [_dataSource respondsToSelector:@selector(menu:imageNameForItemsInRowAtIndexPath:)];
     _dataSourceFlags.detailTextForRowAtIndexPath = [_dataSource respondsToSelector:@selector(menu:detailTextForRowAtIndexPath:)];
     _dataSourceFlags.detailTextForItemsInRowAtIndexPath = [_dataSource respondsToSelector:@selector(menu:detailTextForItemsInRowAtIndexPath:)];
-    
+    _dataSourceFlags.hightLightImageNameForRowAtIndexPath = [_dataSource respondsToSelector:@selector(menu:hightLightImageNameForRowAtIndexPath:)];
     _bottomShadow.hidden = NO;
     CGFloat textLayerInterval = self.frame.size.width / ( _numOfMenu * 2);
     CGFloat separatorLineInterval = self.frame.size.width / _numOfMenu;
@@ -263,11 +276,12 @@
         CGPoint titlePosition = CGPointMake( (i * 2 + 1) * textLayerInterval , self.frame.size.height / 2);
         
         NSString *titleString;
-        if (!self.isClickHaveItemValid && _dataSourceFlags.numberOfItemsInRow && [_dataSource menu:self numberOfItemsInRow:0 column:i]>0) {
-            titleString = [_dataSource menu:self titleForItemsInRowAtIndexPath:[DOPIndexPath indexPathWithCol:i row:0 item:0]];
-        }else {
-            titleString =[_dataSource menu:self titleForRowAtIndexPath:[DOPIndexPath indexPathWithCol:i row:0]];
-        }
+//        if (!self.isClickHaveItemValid && _dataSourceFlags.numberOfItemsInRow && [_dataSource menu:self numberOfItemsInRow:0 column:i]>0) {
+//            titleString = [_dataSource menu:self titleForItemsInRowAtIndexPath:[DOPIndexPath indexPathWithCol:i row:0 item:0]];
+//        }else {
+//            titleString =[_dataSource menu:self titleForRowAtIndexPath:[DOPIndexPath indexPathWithCol:i row:0]];
+//        }
+        titleString =[_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:i row:0]];
         CGSize titleSize = [self calculateTitleSizeWithString:titleString];
         
         CATextLayer *title = [self createTextLayerWithNSString:titleString withColor:self.textColor andPosition:titlePosition];
@@ -303,11 +317,11 @@
         _fontSize = 14;
         _cellStyle = UITableViewCellStyleValue1;
         _separatorColor = kSeparatorColor;
-        _textColor = kTextColor;
+        _textColor = [UIColor lightGrayColor];
         _textSelectedColor = kTextSelectColor;
         _detailTextFont = [UIFont systemFontOfSize:11];
         _detailTextColor = kDetailTextColor;
-        _indicatorColor = kTextColor;
+        _indicatorColor = [UIColor lightGrayColor];
         _tableViewHeight = IS_IPHONE_4_OR_LESS ? 200 : kTableViewHeight;
         _isClickHaveItemValid = YES;
         
@@ -499,7 +513,7 @@
     
     if (forward) {
         // 展开
-        indicator.strokeColor = _textSelectedColor.CGColor;
+        indicator.strokeColor = [UIColor blackColor].CGColor;
     } else {
         // 收缩
         indicator.strokeColor = _textColor.CGColor;
@@ -597,7 +611,7 @@
     if (!show) {
         title.foregroundColor = _textColor.CGColor;
     } else {
-        title.foregroundColor = _textSelectedColor.CGColor;
+        title.foregroundColor = [UIColor blackColor].CGColor;
     }
     complete();
 }
@@ -673,6 +687,19 @@
                 cell.imageView.image = nil;
             }
             
+            if (_dataSourceFlags.hightLightImageNameForRowAtIndexPath) {
+                NSString *imageName = [_dataSource menu:self hightLightImageNameForRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
+                if (imageName && imageName.length > 0) {
+                    cell.imageView.highlightedImage = [UIImage imageNamed:imageName];
+                }else {
+                    cell.imageView.highlightedImage = nil;
+                }
+                
+            }else {
+                cell.imageView.highlightedImage = nil;
+            }
+            
+            
             if (_dataSourceFlags.detailTextForRowAtIndexPath) {
                 NSString *detailText = [_dataSource menu:self detailTextForRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
                 cell.detailTextLabel.text = detailText;
@@ -693,10 +720,10 @@
         if (_dataSourceFlags.numberOfItemsInRow && [_dataSource menu:self numberOfItemsInRow:indexPath.row column:_currentSelectedMenudIndex]> 0){
             cell.accessoryView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"icon_chose_arrow_nor"] highlightedImage:[UIImage imageNamed:@"icon_chose_arrow_sel"]];
         } else {
-            cell.accessoryView = nil;
+            cell.accessoryView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@""] highlightedImage:[UIImage imageNamed:@"hook"]];
         }
         
-        cell.backgroundColor = kCellBgColor;
+        cell.backgroundColor = [UIColor whiteColor];//kCellBgColor;
         
     } else {
         if (_dataSourceFlags.titleForItemsInRowAtIndexPath) {
@@ -715,6 +742,18 @@
                 cell.imageView.image = nil;
             }
             
+            if (_dataSourceFlags.hightLightImageNameForRowAtIndexPath) {
+                NSString *imageName = [_dataSource menu:self hightLightImageNameForRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
+                if (imageName && imageName.length > 0) {
+                    cell.imageView.highlightedImage = [UIImage imageNamed:imageName];
+                }else {
+                    cell.imageView.highlightedImage = nil;
+                }
+                
+            }else {
+                cell.imageView.highlightedImage = nil;
+            }
+            
             if (_dataSourceFlags.detailTextForItemsInRowAtIndexPath) {
                 NSString *detailText = [_dataSource menu:self detailTextForItemsInRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:currentSelectedMenudRow item:indexPath.row]];
                 cell.detailTextLabel.text = detailText;
@@ -731,7 +770,7 @@
             [_rightTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
         }
         cell.backgroundColor = [UIColor whiteColor];
-        cell.accessoryView = nil;
+        cell.accessoryView = cell.accessoryView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"icon_chose_arrow_nor"] highlightedImage:[UIImage imageNamed:@"icon_chose_arrow_sel"]];
     }
     
     return cell;
@@ -792,9 +831,14 @@
         return NO;
         
     } else {
+        if (self.isRemainMenuTitle) {
+            title.string = [_dataSource menu:self titleForRowAtIndexPath:
+                            [DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:row]];
+        }else{
+            title.string = [_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:0]];
+        }
         
-        title.string = [_dataSource menu:self titleForRowAtIndexPath:
-                        [DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:self.isRemainMenuTitle ? 0 : row]];
+        
         [self animateIdicator:_indicators[_currentSelectedMenudIndex] background:_backGroundView tableView:_leftTableView title:_titles[_currentSelectedMenudIndex] forward:NO complecte:^{
             _show = NO;
         }];
