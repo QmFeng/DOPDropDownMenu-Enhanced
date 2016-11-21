@@ -50,6 +50,9 @@
 // 新增 返回 menu 第column列 每行image
 - (NSString *)menu:(DOPDropDownMenu *)menu imageNameForRowAtIndexPath:(DOPIndexPath *)indexPath;
 
+// 新增 返回 menu 第column列 每行image
+- (NSString *)menu:(DOPDropDownMenu *)menu hightLightImageNameForRowAtIndexPath:(DOPIndexPath *)indexPath;
+
 // 新增 detailText ,right text
 - (NSString *)menu:(DOPDropDownMenu *)menu detailTextForRowAtIndexPath:(DOPIndexPath *)indexPath;
 
@@ -69,6 +72,9 @@
 - (NSString *)menu:(DOPDropDownMenu *)menu imageNameForItemsInRowAtIndexPath:(DOPIndexPath *)indexPath;
 // 新增
 - (NSString *)menu:(DOPDropDownMenu *)menu detailTextForItemsInRowAtIndexPath:(DOPIndexPath *)indexPath;
+
+//新增默认的显示标题  
+- (NSString *)menu:(DOPDropDownMenu *)menu titleForColumnAtIndexPath:(DOPIndexPath *)indexPath;
 
 @end
 
