@@ -75,6 +75,8 @@
 }
 
 @property (nonatomic, assign) NSInteger currentSelectedMenudIndex;  // 当前选中列
+@property (nonatomic, assign) NSInteger currentSelectedMenuItem;
+
 
 @property (nonatomic, assign) BOOL show;
 @property (nonatomic, assign) NSInteger numOfMenu;
@@ -764,8 +766,13 @@
         } else {
             //NSAssert(0 == 1, @"dataSource method needs to be implemented");
         }
-        if ([cell.textLabel.text isEqualToString:[(CATextLayer *)[_titles objectAtIndex:_currentSelectedMenudIndex] string]]) {
-            NSInteger currentSelectedMenudRow = [_currentSelectRowArray[_currentSelectedMenudIndex] integerValue];
+        NSInteger currentSelectedMenudRow = [_currentSelectRowArray[_currentSelectedMenudIndex] integerValue];
+        NSInteger currentitems = [_dataSource menu:self numberOfItemsInRow:currentSelectedMenudRow column:_currentSelectedMenudIndex];
+        if (currentitems <= _currentSelectedMenuItem) {
+            _currentSelectedMenuItem = 0;
+        }
+        if ([cell.textLabel.text isEqualToString: [_dataSource menu:self titleForItemsInRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:currentSelectedMenudRow item:_currentSelectedMenuItem]]]) {
+            
             [_leftTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:currentSelectedMenudRow inSection:0] animated:YES scrollPosition:UITableViewScrollPositionMiddle];
             [_rightTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
         }
@@ -821,7 +828,7 @@
         
         // 有双列表 有item数据
         if (self.isClickHaveItemValid) {
-            title.string = [_dataSource menu:self titleForRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:row]];
+            title.string = [_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:row]];
             [self animateTitle:title show:YES complete:^{
                 [_rightTableView reloadData];
             }];
@@ -846,7 +853,7 @@
     }
 }
 - (void)confiMenuWithSelectItem:(NSInteger)item {
-    
+    _currentSelectedMenuItem = item;
     CATextLayer *title = (CATextLayer *)_titles[_currentSelectedMenudIndex];
     NSInteger currentSelectedMenudRow = [_currentSelectRowArray[_currentSelectedMenudIndex] integerValue];
     title.string = [_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:currentSelectedMenudRow item:item]];
