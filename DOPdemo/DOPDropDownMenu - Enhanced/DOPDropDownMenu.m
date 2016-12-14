@@ -215,7 +215,9 @@
     }else if ([_dataSource menu:self numberOfItemsInRow:indexPath.row column:indexPath.column] > indexPath.column) {
         title.string = [_dataSource menu:self titleForColumnAtIndexPath:indexPath];
         if (trigger) {
-            [_delegate menu:self didSelectRowAtIndexPath:indexPath];
+            if (indexPath.item <= 0) {
+                [_delegate menu:self didSelectRowAtIndexPath:indexPath];
+            }
             _currentSelectedMenudIndex = indexPath.column;
             [self tableView:_rightTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.item inSection:0]];
         }
@@ -226,6 +228,9 @@
         CGFloat sizeWidth = (size.width < (self.frame.size.width / _numOfMenu) - 25) ? size.width : self.frame.size.width / _numOfMenu - 25;
         title.bounds = CGRectMake(0, 0, sizeWidth, size.height);
     }
+    
+    
+    
 }
 
 - (void)selectIndexPath:(DOPIndexPath *)indexPath {
@@ -803,7 +808,9 @@
         BOOL isClickHaveItemValid = self.isClickHaveItemValid ? YES : haveItem;
         
         if (isClickHaveItemValid && _delegate && [_delegate respondsToSelector:@selector(menu:didSelectRowAtIndexPath:)]) {
-            [self.delegate menu:self didSelectRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
+            if(indexPath.item <= 0) {
+                [self.delegate menu:self didSelectRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
+            }
         } else {
             //TODO: delegate is nil
         }
