@@ -216,6 +216,8 @@
         title.string = [_dataSource menu:self titleForColumnAtIndexPath:indexPath];
         if (trigger) {
             [_delegate menu:self didSelectRowAtIndexPath:indexPath];
+            _currentSelectedMenudIndex = indexPath.column;
+            [self tableView:_rightTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.item inSection:0]];
         }
         if (_currentSelectRowArray.count > indexPath.column) {
             _currentSelectRowArray[indexPath.column] = @(indexPath.row);
