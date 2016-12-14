@@ -215,14 +215,13 @@
     }else if ([_dataSource menu:self numberOfItemsInRow:indexPath.row column:indexPath.column] > indexPath.column) {
         title.string = [_dataSource menu:self titleForColumnAtIndexPath:indexPath];
         if (trigger) {
-            if (indexPath.item <= 0) {
-                [_delegate menu:self didSelectRowAtIndexPath:indexPath];
-            }
+            [_delegate menu:self didSelectRowAtIndexPath:indexPath];
             _currentSelectedMenudIndex = indexPath.column;
-            [self tableView:_rightTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.item inSection:0]];
+            _currentSelectedMenuItem = indexPath.item;
         }
         if (_currentSelectRowArray.count > indexPath.column) {
             _currentSelectRowArray[indexPath.column] = @(indexPath.row);
+//            _currentSelectRowArray[indexPath.row] = @(indexPath.item);
         }
         CGSize size = [self calculateTitleSizeWithString:title.string];
         CGFloat sizeWidth = (size.width < (self.frame.size.width / _numOfMenu) - 25) ? size.width : self.frame.size.width / _numOfMenu - 25;
@@ -808,9 +807,7 @@
         BOOL isClickHaveItemValid = self.isClickHaveItemValid ? YES : haveItem;
         
         if (isClickHaveItemValid && _delegate && [_delegate respondsToSelector:@selector(menu:didSelectRowAtIndexPath:)]) {
-            if(indexPath.item <= 0) {
-                [self.delegate menu:self didSelectRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
-            }
+            [self.delegate menu:self didSelectRowAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:indexPath.row]];
         } else {
             //TODO: delegate is nil
         }
