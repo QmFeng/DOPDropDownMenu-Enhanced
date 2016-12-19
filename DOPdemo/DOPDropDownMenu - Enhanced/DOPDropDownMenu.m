@@ -847,6 +847,11 @@
         if (self.isRemainMenuTitle) {
             title.string = [_dataSource menu:self titleForRowAtIndexPath:
                             [DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:row]];
+            CAShapeLayer *indicator =(CAShapeLayer *)_indicators[_currentSelectedMenudIndex];
+            CGFloat textLayerInterval = self.frame.size.width / ( _numOfMenu * 2);
+            CGPoint titlePosition = CGPointMake( (_currentSelectedMenudIndex * 2 + 1) * textLayerInterval , self.frame.size.height / 2);
+            CGSize titleSize = [self calculateTitleSizeWithString:title.string];
+            indicator.position = CGPointMake(titlePosition.x + titleSize.width*0.5 +5, self.frame.size.height / 2);
         }else{
             title.string = [_dataSource menu:self titleForColumnAtIndexPath:[DOPIndexPath indexPathWithCol:_currentSelectedMenudIndex row:0]];
         }
